@@ -21,9 +21,9 @@ Let op! Het is niet toegestaan om bestaande modules te importeren en te
 """
 
 # TODO: Vul hier je naam, klas en studentnummer in.
-naam = ""
-klas = ""
-studentnummer = -1
+naam = "Euer"
+klas = "V1H"
+studentnummer = -1893754
 
 debuginfo = True
 
@@ -36,14 +36,19 @@ def is_always_defect(my_history, opponent_history):
     """
     Checkt of je tegenstander 'Always defect' is.
 
-    Args:
-        my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
-        opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
-
-    Returns:
-        bool: True als je tegenstander 'Always defect' is, anders False.
+    Deze blijft de heletijd False spammen dus hier kan je niet tegen winnen alleen gelijk spelen
     """
-    return
+ 
+    if len(opponent_history) == 0:
+        return False
+
+    #    ik kijk hier of de tegenstander true speelt als het antwoord ja is weet ik dat dit niet always defect is
+    for actie in opponent_history:
+        if actie == True:
+            return False
+
+   
+    return True
 
 """
 2. Implementatie play_against_always_defect
@@ -52,17 +57,9 @@ def is_always_defect(my_history, opponent_history):
 """
 def play_against_always_defect(my_history, opponent_history):
     """
-    Geeft de actie terug die gespeeld zal worden tegen 'Always defect' door jouw agent, 
-    gegeven jouw en jouw tegenstanders' acties in het verleden.
-
-    Args:
-        my_history (list[bool]): Een lijst met jouw gespeelde acties in het verleden.
-        opponent_history (list[bool]): Een lijst de door jouw tegenstander gespeelde acties in het verleden.
-
-    Returns:
-        bool: Jouw actie; samenwerken (True) of zelfzuchtig zijn (False).
+    Ik gebruik hier tegen de heletijd false Anders verlies ik en nu speel ik gelijk
     """
-    return
+    return False
 
 """
 3. Implementatie is_alternate
@@ -80,7 +77,25 @@ def is_alternate(my_history, opponent_history):
     Returns:
         bool: True als je tegenstander 'Alternate' is, anders False.
     """
-    return
+    # We hebben minimaal 2 rondes nodig om het afwisselende patroon te herkennen
+    if len(opponent_history) < 2:
+        return False
+
+    # Loop door alle acties van de tegenstander met hun index
+    for i in range(len(opponent_history)):
+        # Alternate speelt True op even indices (0, 2, 4, ...) en False op oneven indices (1, 3, 5, ...)
+        # Dus: als i % 2 == 0 (even), verwachten we True
+        verwachte_actie = (i % 2 == 0)
+        werkelijke_actie = opponent_history[i]
+
+        # Als de werkelijke actie niet overeenkomt met wat we verwachten,
+        # dan is het NIET Alternate
+        if werkelijke_actie != verwachte_actie:
+            return False
+
+    # Als alle acties overeenkomen met het patroon, is het Alternate!
+    return True
+
 
 """
 4. Implementatie play_against_alternate
@@ -89,7 +104,7 @@ def is_alternate(my_history, opponent_history):
 """
 def play_against_alternate(my_history, opponent_history):
     """
-    Geeft de actie terug die gespeeld zal worden tegen 'Alternate' door jouw agent, 
+    Geeft de actie terug die gespeeld zal worden tegen 'Alternate' door jouw agent,
     gegeven jouw en jouw tegenstanders' acties in het verleden.
 
     Args:
@@ -99,7 +114,11 @@ def play_against_alternate(my_history, opponent_history):
     Returns:
         bool: Jouw actie; samenwerken (True) of zelfzuchtig zijn (False).
     """
-    return
+    # Tegen Alternate is altijd False spelen de beste strategie
+    # Even rondes: zij True, jij False → 3 punten (exploiteren!)
+    # Oneven rondes: zij False, jij False → 1 punt
+    # Totaal: 10×3 + 10×1 = 40 punten
+    return False
 
 """
 5. Implementatie is_tit_for_tat
@@ -117,7 +136,34 @@ def is_tit_for_tat(my_history, opponent_history):
     Returns:
         bool: True als je tegenstander 'Tit for tat' is, anders False.
     """
-    return
+    # We hebben minimaal 1 ronde nodig om te detecteren
+    # (Tit for Tat begint altijd met True in ronde 1, daarna kopieert het jou)
+    if len(opponent_history) == 0:
+        return False
+
+    # Check eerste actie: Tit for Tat begint ALTIJD met True (samenwerken)
+    if opponent_history[0] != True:
+        return False
+
+    # Als er maar 1 ronde is gespeeld, kunnen we nog niet zeker weten
+    # (meerdere strategieën kunnen met True beginnen)
+    if len(opponent_history) == 1:
+        return False
+
+    # Vanaf ronde 2 moet Tit for Tat kopiëren wat JIJ de vorige ronde deed
+    # opponent_history[i] moet gelijk zijn aan my_history[i-1]
+    for i in range(1, len(opponent_history)):
+        # Wat deed ik de vorige ronde?
+        mijn_vorige_actie = my_history[i - 1]
+        # Wat deed de tegenstander deze ronde?
+        hun_huidige_actie = opponent_history[i]
+
+        # Als ze niet hetzelfde zijn, is het NIET Tit for Tat
+        if hun_huidige_actie != mijn_vorige_actie:
+            return False
+
+    # Als alle checks kloppen, is het Tit for Tat!
+    return True
 
 """
 6. Implementatie play_against_tit_for_tat
@@ -126,7 +172,7 @@ def is_tit_for_tat(my_history, opponent_history):
 """
 def play_against_tit_for_tat(my_history, opponent_history):
     """
-    Geeft de actie terug die gespeeld zal worden tegen 'Tit for tat' door jouw agent, 
+    Geeft de actie terug die gespeeld zal worden tegen 'Tit for tat' door jouw agent,
     gegeven jouw en jouw tegenstanders' acties in het verleden.
 
     Args:
@@ -136,7 +182,15 @@ def play_against_tit_for_tat(my_history, opponent_history):
     Returns:
         bool: Jouw actie; samenwerken (True) of zelfzuchtig zijn (False).
     """
-    return
+    # Tegen Tit for Tat is altijd samenwerken (True) de beste strategie
+    # Als jij True speelt, spelen zij ook True → beide 2 punten per ronde
+    # 20 rondes × 2 punten = 40 punten totaal
+    #
+    # Als je False zou spelen:
+    # Ronde 1: jij False, zij True → jij 3 punten
+    # Ronde 2-20: beide False → beide 1 punt per ronde
+    # Totaal: 3 + 19 = 22 punten (veel minder!)
+    return True
 
 """
 7. Implementatie play_against_unknown
@@ -145,7 +199,7 @@ def play_against_tit_for_tat(my_history, opponent_history):
 """
 def play_against_unknown(my_history, opponent_history):
     """
-    Geeft de actie terug die gespeeld zal worden tegen een onbekende tegenstander door jouw agent, 
+    Geeft de actie terug die gespeeld zal worden tegen een onbekende tegenstander door jouw agent,
     gegeven jouw en jouw tegenstanders' acties in het verleden.
 
     Args:
@@ -155,7 +209,15 @@ def play_against_unknown(my_history, opponent_history):
     Returns:
         bool: Jouw actie; samenwerken (True) of zelfzuchtig zijn (False).
     """
-    return
+    # Als we de tegenstander nog niet herkennen, spelen we voorzichtig
+    # We beginnen met True (samenwerken) om te testen hoe ze reageren
+    # Dit helpt ons om ze in latere rondes te herkennen
+    #
+    # True is een goede keuze omdat:
+    # - Het helpt Tit for Tat herkennen (ze kopiëren ons)
+    # - Het helpt Alternate herkennen (ze hebben een vast patroon)
+    # - Tegen Always Defect verliezen we wel punten, maar dat herkennen we snel
+    return True
 
 """
 8. Optioneel: Implementatie is_final_round

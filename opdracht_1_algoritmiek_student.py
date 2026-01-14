@@ -25,9 +25,9 @@ import inspect
 
 
 # TODO: Vul hier je naam, klas en studentnummer in.
-naam = ""
-klas = ""
-studentnummer = -1
+naam = "Euer"
+klas = " V1H"
+studentnummer = -1893754
 
 """
 1.  Sorteeralgoritme
